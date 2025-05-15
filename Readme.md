@@ -36,10 +36,10 @@ Works great with Instagram's official [data download](https://www.instagram.com/
 ## 📦 Project Structure
 
 📁 micro-seleb-ig/
-├── index.html                # Main web app (open this in browser)
-├── index.css                 # style web app (you can separated css from index.html if you prefer)
-├── index.js                  # logic web app (you can separated javascript from index.html if you prefer)
-├── README.md                 # Info for users (you're reading it now!)
+├── index.html      # Main web app (open this in browser)
+├── index.css       # Web app styling (can be separated from HTML)
+├── index.js        # Web app logic (can be separated from HTML)
+├── README.md       # You're reading it now!
 
 ## 🔒 Privacy & Safety
 
