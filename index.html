@@ -1,320 +1,335 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cek Following Tidak Follow Balik</title>
-  <style>
-    :root {
-      --primary: #833AB4;
-      --gradient-start: #405DE6;
-      --gradient-mid: #C13584;
-      --gradient-end: #E1306C;
-      --light: #f8f9fa;
-      --dark: #343a40;
-      --shadow: rgba(0, 0, 0, 0.1);
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #1e1e2f;
-      color: var(--dark);
-      line-height: 1.6;
-      padding: 20px;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #27293d;
-      border-radius: 10px;
-      padding: 30px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      background: linear-gradient(45deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-    }
-    
-    h2 {
-      color: white;
-      font-size: 22px;
-      font-weight: 600;
-    }
-    
-    .file-input-group {
-      margin-bottom: 20px;
-    }
-    
-    .file-input-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #e4e4e4;
-    }
-    
-    .helper-text {
-      color: #adb5bd;
-    }
-    
-    .file-input {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #dbdbdb;
-      border-radius: 5px;
-      background-color: #fafafa;
-      font-size: 14px;
-    }
-    
-    .file-name {
-      font-weight: bold;
-      color: var(--primary);
-    }
-    
-    .cek-button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(45deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    
-    .cek-button:hover {
-      opacity: 0.9;
-    }
-    
-    .cek-button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    
-    .result-container {
-      margin-top: 30px;
-      display: none;
-    }
-    
-    .result-title {
-      font-weight: 600;
-      margin-bottom: 10px;
-      font-size: 18px;
-      color: #e4e4e4;
-    }
-    
-    .result-list {
-      max-height: 300px;
-      overflow-y: auto;
-      background-color: #323649;
-      border: 1px solid #42435c;
-      border-radius: 5px;
-      padding: 15px;
-      color: #e4e4e4;
-    }
-    
-    .username {
-      padding: 8px 10px;
-      border-bottom: 1px solid #42435c;
-    }
-    
-    .username:last-child {
-      border-bottom: none;
-    }
-    
-    .loader {
-      display: none;
-      text-align: center;
-      margin: 20px 0;
-    }
-    
-    .loader p {
-      color: #e4e4e4;
-      margin-top: 10px;
-    }
-    
-    .loader-spinner {
-      width: 30px;
-      height: 30px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .count-info {
-      margin-top: 10px;
-      text-align: center;
-      font-size: 14px;
-      color: #adb5bd;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="logo">Instagram Check Micro Seleb</div>
-      <h2>Cek Siapa yang Micro Seleb</h2>
-    </div>
-    
-    <div class="file-input-group">
-      <label class="file-input-label">File Following:</label>
-      <input type="file" id="followingFile" accept=".json" class="file-input">
-      <div class="helper-text">Pilih file <span class="file-name">following.json</span></div>
-    </div>
-    
-    <div class="file-input-group">
-      <label class="file-input-label">File Followers:</label>
-      <input type="file" id="followersFile" accept=".json" class="file-input">
-      <div class="helper-text">Pilih file <span class="file-name">followers_1.json</span></div>
-    </div>
-    
-    <button id="cekButton" class="cek-button" disabled>Cek!</button>
-    
-    <div class="loader" id="loader">
-      <div class="loader-spinner"></div>
-      <p>Sedang menganalisis data...</p>
-    </div>
-    
-    <div class="result-container" id="resultContainer">
-      <div class="result-title">Orang yang tidak mengikuti kamu balik:</div>
-      <div class="count-info" id="countInfo"></div>
-      <div class="result-list" id="resultList"></div>
-    </div>
-  </div>
-
-  <script>
-    // Main JavaScript untuk aplikasi
-    document.addEventListener('DOMContentLoaded', function() {
-      const followingFileInput = document.getElementById('followingFile');
-      const followersFileInput = document.getElementById('followersFile');
-      const cekButton = document.getElementById('cekButton');
-      const loader = document.getElementById('loader');
-      const resultContainer = document.getElementById('resultContainer');
-      const resultList = document.getElementById('resultList');
-      const countInfo = document.getElementById('countInfo');
-      
-      // Fungsi untuk mengaktifkan/menonaktifkan tombol
-      function updateButtonState() {
-        cekButton.disabled = !(followingFileInput.files.length > 0 && followersFileInput.files.length > 0);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cek Microseleb Instagram</title>
+    <style>
+      :root {
+        --primary: #833ab4;
+        --gradient-start: #405de6;
+        --gradient-mid: #c13584;
+        --gradient-end: #e1306c;
+        --light: #f8f9fa;
+        --dark: #343a40;
+        --shadow: rgba(0, 0, 0, 0.1);
       }
-      
-      // Pasang event listener untuk input file
-      followingFileInput.addEventListener('change', updateButtonState);
-      followersFileInput.addEventListener('change', updateButtonState);
-      
-      // Pasang event listener untuk tombol cek
-      cekButton.addEventListener('click', checkFollowers);
-      
-      // Fungsi utama untuk memeriksa follower
-      function checkFollowers() {
-        // Tampilkan loader
-        loader.style.display = 'block';
-        resultContainer.style.display = 'none';
-        
-        // Baca file following
-        readFileAsJson(followingFileInput.files[0])
-          .then(followingData => {
-            // Ekstrak username dari data following
-            const followingRaw = Array.isArray(followingData) ? followingData : followingData.relationships_following || [];
-            const following = followingRaw.map(item => item.string_list_data[0].value);
-            
-            // Baca file followers
-            return readFileAsJson(followersFileInput.files[0])
-              .then(followersData => {
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #1e1e2f;
+        color: var(--dark);
+        line-height: 1.6;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #27293d;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        color: white;
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      .file-input-group {
+        margin-bottom: 20px;
+      }
+
+      .file-input-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #e4e4e4;
+      }
+
+      .helper-text {
+        color: #adb5bd;
+      }
+
+      .file-input {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dbdbdb;
+        border-radius: 5px;
+        background-color: #fafafa;
+        font-size: 14px;
+      }
+
+      .file-name {
+        font-weight: bold;
+        color: var(--primary);
+      }
+
+      .cek-button {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(45deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      .cek-button:hover {
+        opacity: 0.9;
+      }
+
+      .cek-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .result-container {
+        margin-top: 30px;
+        display: none;
+      }
+
+      .result-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 18px;
+        color: #e4e4e4;
+      }
+
+      .result-list {
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: #323649;
+        border: 1px solid #42435c;
+        border-radius: 5px;
+        padding: 15px;
+        color: #e4e4e4;
+      }
+
+      .username {
+        padding: 8px 10px;
+        border-bottom: 1px solid #42435c;
+      }
+
+      .username:last-child {
+        border-bottom: none;
+      }
+
+      .loader {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .loader p {
+        color: #e4e4e4;
+        margin-top: 10px;
+      }
+
+      .loader-spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .count-info {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 14px;
+        color: #adb5bd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo">Instagram Check Micro Seleb</div>
+        <h2>Cek Siapa yang Micro Seleb</h2>
+      </div>
+
+      <div class="file-input-group">
+        <label class="file-input-label">File Following:</label>
+        <input type="file" id="followingFile" accept=".json" class="file-input" />
+        <div class="helper-text">Pilih file <span class="file-name">following.json</span></div>
+      </div>
+
+      <div class="file-input-group">
+        <label class="file-input-label">File Followers:</label>
+        <input type="file" id="followersFile" accept=".json" class="file-input" />
+        <div class="helper-text">Pilih file <span class="file-name">followers_1.json</span></div>
+      </div>
+
+      <button id="cekButton" class="cek-button" disabled>Cek!</button>
+
+      <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <p>Sedang menganalisis data...</p>
+      </div>
+
+      <div class="result-container" id="resultContainer">
+        <div class="result-title">Orang yang tidak mengikuti kamu balik:</div>
+        <div class="count-info" id="countInfo"></div>
+        <div class="result-list" id="resultList"></div>
+      </div>
+    </div>
+
+    <div style="text-align: center; color: #adb5bd; margin-top: 30px; font-size: 13px">
+      <p>
+        Made with ❤️ by
+        <a href="https://github.com/3ncynida" target="_blank" style="color: #ccc; text-decoration: none">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub" style="width: 14px; vertical-align: middle; margin-right: 4px; filter: invert(90%)" />
+          @3ncynida
+        </a>
+        • MIT License (2025)<br />
+        100% free!!! 🛡️ | Enjoy responsibly~ (＾▽＾)
+      </p>
+    </div>
+
+    <script>
+      // Main JavaScript untuk aplikasi
+      document.addEventListener("DOMContentLoaded", function () {
+        const followingFileInput = document.getElementById("followingFile");
+        const followersFileInput = document.getElementById("followersFile");
+        const cekButton = document.getElementById("cekButton");
+        const loader = document.getElementById("loader");
+        const resultContainer = document.getElementById("resultContainer");
+        const resultList = document.getElementById("resultList");
+        const countInfo = document.getElementById("countInfo");
+
+        // Fungsi untuk mengaktifkan/menonaktifkan tombol
+        function updateButtonState() {
+          cekButton.disabled = !(followingFileInput.files.length > 0 && followersFileInput.files.length > 0);
+        }
+
+        // Pasang event listener untuk input file
+        followingFileInput.addEventListener("change", updateButtonState);
+        followersFileInput.addEventListener("change", updateButtonState);
+
+        // Pasang event listener untuk tombol cek
+        cekButton.addEventListener("click", checkFollowers);
+
+        // Fungsi utama untuk memeriksa follower
+        function checkFollowers() {
+          // Tampilkan loader
+          loader.style.display = "block";
+          resultContainer.style.display = "none";
+
+          // Baca file following
+          readFileAsJson(followingFileInput.files[0])
+            .then((followingData) => {
+              // Ekstrak username dari data following
+              const followingRaw = Array.isArray(followingData) ? followingData : followingData.relationships_following || [];
+              const following = followingRaw.map((item) => item.string_list_data[0].value);
+
+              // Baca file followers
+              return readFileAsJson(followersFileInput.files[0]).then((followersData) => {
                 // Ekstrak username dari data followers
                 const followersRaw = Array.isArray(followersData) ? followersData : followersData.relationships_followers || [];
-                const followers = followersRaw.map(item => item.string_list_data[0].value);
-                
+                const followers = followersRaw.map((item) => item.string_list_data[0].value);
+
                 // Temukan yang tidak follow balik
-                const notFollowingBack = following.filter(user => !followers.includes(user));
-                
+                const notFollowingBack = following.filter((user) => !followers.includes(user));
+
                 // Tampilkan hasil
                 displayResults(notFollowingBack, following.length, followers.length);
               });
-          })
-          .catch(error => {
-            alert('Error: ' + error.message);
-            loader.style.display = 'none';
-          });
-      }
-      
-      // Fungsi untuk membaca file JSON
-      function readFileAsJson(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          
-          reader.onload = event => {
-            try {
-              const data = JSON.parse(event.target.result);
-              resolve(data);
-            } catch (error) {
-              reject(new Error('File JSON tidak valid'));
-            }
-          };
-          
-          reader.onerror = () => reject(new Error('Gagal membaca file'));
-          reader.readAsText(file);
-        });
-      }
-      
-      // Fungsi untuk menampilkan hasil
-      function displayResults(notFollowingBack, followingCount, followersCount) {
-        // Sembunyikan loader
-        loader.style.display = 'none';
-        
-        // Update info jumlah
-        countInfo.textContent = `Dari ${followingCount} following, terdapat ${notFollowingBack.length} orang yang tidak follow balik`;
-        
-        // Kosongkan daftar hasil
-        resultList.innerHTML = '';
-        
-        // Tambahkan setiap username ke daftar hasil
-        if (notFollowingBack.length > 0) {
-          notFollowingBack.forEach(username => {
-            const div = document.createElement('div');
-            div.className = 'username';
-            div.textContent = username;
-            resultList.appendChild(div);
-          });
-        } else {
-          const div = document.createElement('div');
-          div.className = 'username';
-          div.textContent = 'Semua orang telah follow kamu balik!';
-          resultList.appendChild(div);
+            })
+            .catch((error) => {
+              alert("Error: " + error.message);
+              loader.style.display = "none";
+            });
         }
-        
-        // Tampilkan container hasil
-        resultContainer.style.display = 'block';
-      }
-    });
-  </script>
-</body>
+
+        // Fungsi untuk membaca file JSON
+        function readFileAsJson(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+              try {
+                const data = JSON.parse(event.target.result);
+                resolve(data);
+              } catch (error) {
+                reject(new Error("File JSON tidak valid"));
+              }
+            };
+
+            reader.onerror = () => reject(new Error("Gagal membaca file"));
+            reader.readAsText(file);
+          });
+        }
+
+        // Fungsi untuk menampilkan hasil
+        function displayResults(notFollowingBack, followingCount, followersCount) {
+          // Sembunyikan loader
+          loader.style.display = "none";
+
+          // Update info jumlah
+          countInfo.textContent = `Dari ${followingCount} following, terdapat ${notFollowingBack.length} orang yang tidak follow balik`;
+
+          // Kosongkan daftar hasil
+          resultList.innerHTML = "";
+
+          // Tambahkan setiap username ke daftar hasil
+          if (notFollowingBack.length > 0) {
+            notFollowingBack.forEach((username) => {
+              const div = document.createElement("div");
+              div.className = "username";
+              div.textContent = username;
+              resultList.appendChild(div);
+            });
+          } else {
+            const div = document.createElement("div");
+            div.className = "username";
+            div.textContent = "Semua orang telah follow kamu balik!";
+            resultList.appendChild(div);
+          }
+
+          // Tampilkan container hasil
+          resultContainer.style.display = "block";
+        }
+      });
+    </script>
+  </body>
 </html>
