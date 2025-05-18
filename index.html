@@ -61,6 +61,7 @@
 
       .file-input-group {
         margin-bottom: 20px;
+        position: relative;
       }
 
       .file-input-label {
@@ -72,6 +73,7 @@
 
       .helper-text {
         color: #adb5bd;
+        transition: all 0.3s ease;
       }
 
       .file-input {
@@ -82,11 +84,86 @@
         border-radius: 5px;
         background-color: #fafafa;
         font-size: 14px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .file-input:hover {
+        border-color: #a7a7a7;
+        box-shadow: 0 0 0 3px rgba(129, 58, 180, 0.1);
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .file-input-custom {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        padding: 0;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0;
+        filter: alpha(opacity=0);
+      }
+
+      .file-input-button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 2px dashed #42435c;
+        border-radius: 5px;
+        background-color: #323649;
+        color: #e4e4e4;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .file-input-button:hover {
+        border-color: var(--primary);
+        background-color: #3a3d5a;
+      }
+
+      .file-input-button.file-selected {
+        border-style: solid;
+        border-color: var(--primary);
+        background: linear-gradient(45deg, #323649, #3a3d5a);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(131, 58, 180, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(131, 58, 180, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(131, 58, 180, 0);
+        }
       }
 
       .file-name {
         font-weight: bold;
         color: var(--primary);
+      }
+
+      .file-status {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #adb5bd;
+        transition: all 0.3s ease;
+      }
+
+      .file-status.file-selected {
+        color: #64d86b;
       }
 
       .cek-button {
@@ -100,21 +177,77 @@
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: opacity 0.2s;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
       }
 
       .cek-button:hover {
         opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.25);
+      }
+
+      .cek-button:active {
+        transform: translateY(1px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
       }
 
       .cek-button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .cek-button:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+      }
+
+      .cek-button:not(:disabled):focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0, 0);
+          opacity: 0.5;
+        }
+        20% {
+          transform: scale(25, 25);
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 0;
+          transform: scale(40, 40);
+        }
       }
 
       .result-container {
         margin-top: 30px;
         display: none;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .result-title {
@@ -137,6 +270,19 @@
       .username {
         padding: 8px 10px;
         border-bottom: 1px solid #42435c;
+        animation: slideIn 0.3s ease-out;
+        animation-fill-mode: both;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
       }
 
       .username:last-child {
@@ -179,6 +325,25 @@
         font-size: 14px;
         color: #adb5bd;
       }
+
+      /* Custom scrollbar */
+      .result-list::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .result-list::-webkit-scrollbar-track {
+        background: #323649;
+        border-radius: 5px;
+      }
+
+      .result-list::-webkit-scrollbar-thumb {
+        background: #42435c;
+        border-radius: 5px;
+      }
+
+      .result-list::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+      }
     </style>
   </head>
   <body>
@@ -190,14 +355,24 @@
 
       <div class="file-input-group">
         <label class="file-input-label">File Following:</label>
-        <input type="file" id="followingFile" accept=".json" class="file-input" />
-        <div class="helper-text">Pilih file <span class="file-name">following.json</span></div>
+        <div class="file-input-wrapper">
+          <div id="followingButton" class="file-input-button">
+            <span id="followingButtonText">Pilih file following.json</span>
+            <input type="file" id="followingFile" accept=".json" class="file-input-custom" />
+          </div>
+          <span id="followingStatus" class="file-status">Belum dipilih</span>
+        </div>
       </div>
 
       <div class="file-input-group">
         <label class="file-input-label">File Followers:</label>
-        <input type="file" id="followersFile" accept=".json" class="file-input" />
-        <div class="helper-text">Pilih file <span class="file-name">followers_1.json</span></div>
+        <div class="file-input-wrapper">
+          <div id="followersButton" class="file-input-button">
+            <span id="followersButtonText">Pilih file followers_1.json</span>
+            <input type="file" id="followersFile" accept=".json" class="file-input-custom" />
+          </div>
+          <span id="followersStatus" class="file-status">Belum dipilih</span>
+        </div>
       </div>
 
       <button id="cekButton" class="cek-button" disabled>Cek!</button>
@@ -222,7 +397,7 @@
           @3ncynida
         </a>
         • MIT License (2025)<br />
-        100% free!!! 🛡️ | Enjoy responsibly~ (＾▽＾)
+        100% free!!! | Enjoy responsibly~ (＾▽＾)
       </p>
     </div>
 
@@ -231,15 +406,69 @@
       document.addEventListener("DOMContentLoaded", function () {
         const followingFileInput = document.getElementById("followingFile");
         const followersFileInput = document.getElementById("followersFile");
+        const followingButton = document.getElementById("followingButton");
+        const followersButton = document.getElementById("followersButton");
+        const followingButtonText = document.getElementById("followingButtonText");
+        const followersButtonText = document.getElementById("followersButtonText");
+        const followingStatus = document.getElementById("followingStatus");
+        const followersStatus = document.getElementById("followersStatus");
         const cekButton = document.getElementById("cekButton");
         const loader = document.getElementById("loader");
         const resultContainer = document.getElementById("resultContainer");
         const resultList = document.getElementById("resultList");
         const countInfo = document.getElementById("countInfo");
 
-        // Fungsi untuk mengaktifkan/menonaktifkan tombol
+        // Klik pada button untuk memicu input file
+        followingButton.addEventListener("click", function () {
+          followingFileInput.click();
+        });
+
+        followersButton.addEventListener("click", function () {
+          followersFileInput.click();
+        });
+
+        // Fungsi untuk mengaktifkan/menonaktifkan tombol dan update UI
         function updateButtonState() {
-          cekButton.disabled = !(followingFileInput.files.length > 0 && followersFileInput.files.length > 0);
+          const followingSelected = followingFileInput.files.length > 0;
+          const followersSelected = followersFileInput.files.length > 0;
+
+          // Update status dan tampilan untuk following file
+          if (followingSelected) {
+            const fileName = followingFileInput.files[0].name;
+            followingButtonText.textContent = fileName;
+            followingStatus.textContent = "File dipilih ✓";
+            followingStatus.className = "file-status file-selected";
+            followingButton.className = "file-input-button file-selected";
+          } else {
+            followingButtonText.textContent = "Pilih file following.json";
+            followingStatus.textContent = "Belum dipilih";
+            followingStatus.className = "file-status";
+            followingButton.className = "file-input-button";
+          }
+
+          // Update status dan tampilan untuk followers file
+          if (followersSelected) {
+            const fileName = followersFileInput.files[0].name;
+            followersButtonText.textContent = fileName;
+            followersStatus.textContent = "File dipilih ✓";
+            followersStatus.className = "file-status file-selected";
+            followersButton.className = "file-input-button file-selected";
+          } else {
+            followersButtonText.textContent = "Pilih file followers_1.json";
+            followersStatus.textContent = "Belum dipilih";
+            followersStatus.className = "file-status";
+            followersButton.className = "file-input-button";
+          }
+
+          // Aktifkan/nonaktifkan tombol cek
+          cekButton.disabled = !(followingSelected && followersSelected);
+
+          // Tambahkan efek animasi ke tombol jika aktif
+          if (!cekButton.disabled) {
+            cekButton.classList.add("ready");
+          } else {
+            cekButton.classList.remove("ready");
+          }
         }
 
         // Pasang event listener untuk input file
@@ -302,31 +531,35 @@
 
         // Fungsi untuk menampilkan hasil
         function displayResults(notFollowingBack, followingCount, followersCount) {
-          // Sembunyikan loader
           loader.style.display = "none";
 
-          // Update info jumlah
           countInfo.textContent = `Dari ${followingCount} following, terdapat ${notFollowingBack.length} orang yang tidak follow balik`;
 
-          // Kosongkan daftar hasil
           resultList.innerHTML = "";
 
-          // Tambahkan setiap username ke daftar hasil
           if (notFollowingBack.length > 0) {
-            notFollowingBack.forEach((username) => {
+            notFollowingBack.forEach((username, index) => {
               const div = document.createElement("div");
               div.className = "username";
-              div.textContent = username;
+              div.style.animationDelay = `${index * 0.05}s`;
+
+              const link = document.createElement("a");
+              link.href = `https://instagram.com/${username}`;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              link.textContent = username;
+              link.style.color = "#c5bfff";
+              link.style.textDecoration = "none";
+
+              div.appendChild(link);
               resultList.appendChild(div);
             });
           } else {
             const div = document.createElement("div");
             div.className = "username";
-            div.textContent = "Semua orang telah follow kamu balik!";
+            div.textContent = "Semua orang telah follow kamu balik! ✨";
             resultList.appendChild(div);
           }
-
-          // Tampilkan container hasil
           resultContainer.style.display = "block";
         }
       });
